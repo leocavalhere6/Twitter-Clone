@@ -92,7 +92,8 @@ export default function HomePage() {
       {/* Right Sidebar Widgets */}
       <aside className="widgets">
         <div className="status-card">
-          <h3 style={{ marginBottom: "12px" }}>What's happening</h3>
+          {/* Corrigido aqui: What&apos;s happening */}
+          <h3 style={{ marginBottom: "12px" }}>What&apos;s happening</h3>
           <div style={{ color: "#71767b", fontSize: "0.9rem" }}>
             Backend Architecture
           </div>
