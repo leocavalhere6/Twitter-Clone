@@ -41,6 +41,10 @@ describe("infra/controller.js", () => {
     });
 
     test("deve tratar erros não esperados como InternalServerError (500)", () => {
+      const spyConsole = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const req = { url: "/api/v1/users", method: "GET" };
       const res = createMockRes();
       const genericError = new Error("Erro inesperado no banco");
@@ -54,6 +58,8 @@ describe("infra/controller.js", () => {
           statusCode: 500,
         }),
       );
+
+      spyConsole.mockRestore();
     });
   });
 });
