@@ -13,6 +13,11 @@ const createJestConfig = nextJest({
 const jestConfig = createJestConfig({
   moduleDirectories: ["node_modules", "<rootDir>"],
   testTimeout: 60000,
+  testPathIgnorePatterns: [
+    "<rootDir>/node_modules/",
+    "<rootDir>/.next/",
+    "<rootDir>/tests/e2e/",
+  ],
   collectCoverageFrom: [
     "infra/**/*.{js,ts}",
     "models/**/*.{js,ts}",
