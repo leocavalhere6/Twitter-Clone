@@ -1,76 +1,68 @@
-Roteiro Mestre de Desenvolvimento (11 PRs)
-Fase 1: Fundação de Engenharia e Qualidade
+Fase 1: Fundação de Engenharia, Qualidade e Interface Inicial
+PR #1: Higiene do Repositório (.gitignore & Clean Build) (Concluído)
 
-PR #1: Higiene do Repositório (.gitignore & Clean Build)
+Escopo: Remoção de pastas compiladas e ajuste fino do .gitignore.
 
-Remoção das pastas compiladas (.next, .swc) do rastreamento do Git.
+PR #2: Tipagem Estática (TypeScript Setup) (Concluído)
 
-Ajuste fino do .gitignore para prevenir acúmulo de arquivos temporários.
+Escopo: Configuração do tsconfig.json e migração gradual dos módulos de infra e models.
 
-PR #2: Tipagem Estática (TypeScript Setup)
+PR #3: Validação Declarativa de Schemas (Zod) (Concluído)
 
-Configuração do tsconfig.json e suporte a compilação.
+Escopo: Validação estrita de payloads HTTP e variáveis de ambiente.
 
-Migração gradual dos módulos principais de infra/ e models/.
+PR #4: Observabilidade e Logs Estruturados (Pino) (Concluído)
 
-PR #3: Validação Declarativa de Schemas (Zod)
+Escopo: Substituição de console.log por logs em JSON integrados ao tratamento de erros.
 
-Validação de payloads HTTP e variáveis de ambiente com contratos estritos.
+PR #5: Middleware de Rate Limiting (Concluído)
 
-Eliminação de verificações manuais de campos (if (!email) ...).
+Escopo: Proteção de rotas sensíveis contra força bruta usando Redis.
 
-PR #4: Observabilidade e Logs Estruturados (Pino)
+PR #6: Interface Mínima de Front-end
 
-Substituição de console.log por logs formatados em JSON.
+Escopo: Reescrever a tela inicial atual para entregar uma interface web limpa, responsiva e com identidade visual inspirada no Twitter (feed básico, layout de colunas, navegação lateral e formulário de postagem).
 
-Mapeamento de níveis de log (info, warn, error) integrados ao infra/errors.js.
+Impacto: Estabelece uma base visual real e funcional logo no início para validações e testes de UI.
 
-PR #5: Middleware de Rate Limiting
+PR #7: Testes End-to-End e de API (Playwright)
 
-Limitação de requisições por IP usando Redis.
+Escopo: Configuração do runner do Playwright e criação de smoke tests automatizados e testes de rotas HTTP.
 
-Bloqueio contra ataques de força bruta em rotas sensíveis.
+PR #8: Abstração de Banco de Dados (Drizzle ORM)
 
-    PR PROXIMO PR E ESSES Scope: Configures Jest to generate automated coverage reports (LCOV, HTML, text) and sets quality thresholds for infra, models, and api.
+Escopo: Adição do Drizzle ORM mantendo a performance de SQL puro com type-safety e autocompletion.
 
-Impact: Adds the npm run test:coverage script and updates .gitignore to enable automated quality gates in CI/CD.
+Fase 2: O Pivo Arquitetural (Backend em NestJS)
+PR #9: Migração para o NestJS (Fundação de Domínios)
 
-PR #6: Testes End-to-End e de API (Playwright)
+Escopo: Estruturação da pasta src/, configuração do DatabaseService global e migração dos módulos base (Status, Migrations, Users) para o padrão de Controllers, Services e Repositories do NestJS.
 
-Configuração do runner do Playwright.
+Fase 3: Identidade, Segurança e Comunicação (Diretamente no NestJS)
+(Tudo construído na nova arquitetura limpa, evitando qualquer retrabalho)
 
-Criação de testes E2E focados em rotas de API e smoke tests de navegação.
+PR #10: Serviço de E-mails Transacionais
 
-PR #7: Abstração de Banco de Dados (Query Builder)
+Escopo: Configuração do Mailpit no Docker e abstração de envio de templates HTML via serviços do NestJS.
 
-Adição do Drizzle ORM ou Kysely para autocompletion e queries type-safe.
+PR #11: Perfil de Usuário & Engenharia de Senhas
 
-Manutenção da performance de SQL puro com proteção contra SQL Injection.
+Escopo: Hash seguro de senhas com Argon2/Bcrypt e fluxo de tokens de ativação de conta por e-mail.
 
-Fase 2: Identidade, Segurança e Comunicação
+PR #12: Sistema de Autenticação
 
-PR #8: Serviço de E-mails Transacionais
+Escopo: Endpoints de login e logout (POST/DELETE /api/v1/sessions) gerenciando sessões via cookies HttpOnly, Secure e SameSite=Lax.
 
-Configuração do container do Mailpit no infra/compose.yaml para ambiente local.
+PR #13: Sistema de Autorização (RBAC)
 
-Criação da abstração infra/email.js para envio e renderização de templates HTML.
+Escopo: Guards e Middlewares do NestJS para proteção de rotas privadas e validação de permissões por escopo.
 
-PR #9: Perfil de Usuário & Engenharia de Senhas
+Fase 4: Escalabilidade e Arquitetura Avançada
+PR #14: Desacoplamento em Microsserviços
 
-Modelagem completa de usuários e políticas de complexidade de senha.
+Escopo: Quebra dos domínios do NestJS em serviços independentes (ex: Serviço de Usuários e Serviço de Posts) comunicando-se de forma assíncrona via mensageria (RabbitMQ).
 
-Hash de senhas usando Argon2d ou Bcrypt com salting automático.
+Fase 5: Experiência Completa do Usuário (Front-end Definitivo)
+PR #15: Desenvolvimento Completo do Front-End (Next.js)
 
-Criação e validação de tokens de ativação de conta enviados por e-mail.
-
-PR #10: Sistema de Autenticação
-
-Endpoint de login (POST /api/v1/sessions) e logout (DELETE /api/v1/sessions).
-
-Gerenciamento de sessões com cookies HttpOnly, Secure e SameSite=Lax.
-
-PR #11: Sistema de Autorização
-
-Middlewares de proteção de rotas privadas e validação de sessão ativa.
-
-Controle de acesso baseado em papéis ou escopos de permissão (RBAC).
+Escopo: Construção de todas as páginas da aplicação no Next.js (perfil, timeline em tempo real, interações, notificações) totalmente integradas aos microsserviços do NestJS.
