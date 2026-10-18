@@ -1,58 +1,48 @@
-import database from "infra/database.js";
+import { eq, sql } from "drizzle-orm";
+import { db } from "infra/drizzle.ts";
+import { users } from "models/schema.ts";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function findOneByUsername(username) {
-  const userFound = await runSelectQuery(username);
+  const [userFound] = await db
+    .select()
+    .from(users)
+    .where(sql`LOWER(${users.username}) = LOWER(${username})`)
+    .limit(1);
+
+  if (!userFound) {
+    throw new NotFoundError({
+      message: "O username informado não foi encontrado no sistema.",
+      action: "Verifique se o username está digitado corretamente.",
+    });
+  }
 
   return userFound;
-
-  async function runSelectQuery(username) {
-    const results = await database.query({
-      text: `
-        SELECT
-          *
-        FROM
-          users
-        WHERE
-          LOWER(username) = LOWER($1)
-        LIMIT
-          1
-        ;`,
-      values: [username],
-    });
-
-    if (results.rowCount === 0) {
-      throw new NotFoundError({
-        message: "O username informado não foi encontrado no sistema.",
-        action: "Verifique se o username está digitado corretamente.",
-      });
-    }
-
-    return results.rows[0];
-  }
 }
 
 async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
 
-  const newUser = await runInsertQuery(userInputValues);
+  const [newUser] = await db
+    .insert(users)
+    .values({
+      username: userInputValues.username,
+      email: userInputValues.email,
+      password: userInputValues.password,
+    })
+    .returning();
+
   return newUser;
 
   async function validateUniqueEmail(email) {
-    const results = await database.query({
-      text: `
-        SELECT
-          email
-        FROM
-          users
-        WHERE
-          LOWER(email) = LOWER($1)
-        ;`,
-      values: [email],
-    });
+    const [existingEmail] = await db
+      .select({ email: users.email })
+      .from(users)
+      .where(sql`LOWER(${users.email}) = LOWER(${email})`)
+      .limit(1);
 
-    if (results.rowCount > 0) {
+    if (existingEmail) {
       throw new ValidationError({
         message: "O email informado já está sendo utilizado.",
         action: "Utilize outro email para realizar o cadastro.",
@@ -61,43 +51,18 @@ async function create(userInputValues) {
   }
 
   async function validateUniqueUsername(username) {
-    const results = await database.query({
-      text: `
-        SELECT
-          username
-        FROM
-          users
-        WHERE
-          LOWER(username) = LOWER($1)
-        ;`,
-      values: [username],
-    });
+    const [existingUser] = await db
+      .select({ username: users.username })
+      .from(users)
+      .where(sql`LOWER(${users.username}) = LOWER(${username})`)
+      .limit(1);
 
-    if (results.rowCount > 0) {
+    if (existingUser) {
       throw new ValidationError({
         message: "O username informado já está sendo utilizado.",
         action: "Utilize outro username para realizar o cadastro.",
       });
     }
-  }
-
-  async function runInsertQuery(userInputValues) {
-    const results = await database.query({
-      text: `
-        INSERT INTO
-          users (username, email, password)
-        VALUES
-          ($1, $2, $3)
-        RETURNING
-          *
-        ;`,
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
-    });
-    return results.rows[0];
   }
 }
 
