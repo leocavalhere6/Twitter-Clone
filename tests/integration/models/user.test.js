@@ -1,5 +1,17 @@
 import user from "models/user.js";
+import database from "infra/database.js";
+import orchestrator from "tests/orchestrator.js";
 import { NotFoundError, ValidationError } from "infra/errors.js";
+
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await database.query("drop schema public cascade; create schema public;");
+
+  const response = await fetch("http://localhost:3000/api/v1/migrations", {
+    method: "POST",
+  });
+  await response.json();
+});
 
 describe("models/user.js", () => {
   test("findOneByUsername com username inexistente deve lançar NotFoundError", async () => {
