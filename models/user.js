@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db } from "infra/drizzle.ts";
 import { users } from "models/schema.ts";
 import { ValidationError, NotFoundError } from "infra/errors.js";

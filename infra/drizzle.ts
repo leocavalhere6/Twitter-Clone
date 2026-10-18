@@ -1,14 +1,12 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-// @ts-ignore
-import database from "infra/database";
+import { Pool } from "pg";
 import * as schema from "../models/schema";
-import pg from "pg";
-
-const { Pool } = pg;
 
 function getSSLValues() {
   if (process.env.POSTGRES_CA) {
-    return { ca: process.env.POSTGRES_CA };
+    return {
+      ca: process.env.POSTGRES_CA,
+    };
   }
   return process.env.NODE_ENV === "production" ? true : false;
 }
@@ -20,7 +18,7 @@ const pool = new Pool({
   database: process.env.POSTGRES_DB,
   password: process.env.POSTGRES_PASSWORD,
   ssl: getSSLValues(),
-  max: 10,
+  max: 1,
 });
 
 export const db = drizzle(pool, { schema });
