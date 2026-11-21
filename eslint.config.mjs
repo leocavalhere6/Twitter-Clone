@@ -13,8 +13,32 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
+const jestGlobals = {
+  afterAll: "readonly",
+  afterEach: "readonly",
+  beforeAll: "readonly",
+  beforeEach: "readonly",
+  describe: "readonly",
+  expect: "readonly",
+  it: "readonly",
+  jest: "readonly",
+  test: "readonly",
+};
+
 export default defineConfig([
   {
     extends: [...nextCoreWebVitals, ...compat.extends("eslint:recommended")],
+  },
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {
+      "no-unused-vars": "off",
+    },
+  },
+  {
+    files: ["tests/**/*", "tests/**"],
+    languageOptions: {
+      globals: jestGlobals,
+    },
   },
 ]);

@@ -1,8 +1,17 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:jest/recommended",
-    "prettier"
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["tests/**/*", "tests/**"],
+      "env": {
+        "jest": true
+      }
+    }
   ]
 }
