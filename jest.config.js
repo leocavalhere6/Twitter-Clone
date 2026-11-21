@@ -18,10 +18,17 @@ const jestConfig = createJestConfig({
     "<rootDir>/.next/",
     "<rootDir>/tests/e2e/",
   ],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(@nestjs|rxjs)/)",
+    "^.+\\.module\\.(css|sass|scss)$",
+  ],
   collectCoverageFrom: [
     "infra/**/*.{js,ts}",
     "models/**/*.{js,ts}",
+    "src/**/*.ts",
     "!**/*.test.{js,ts}",
+    "!src/main.ts",
+    "!src/**/*.module.ts",
     "!infra/migrations/**",
     "!infra/scripts/**",
   ],
