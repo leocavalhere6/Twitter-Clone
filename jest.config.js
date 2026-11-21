@@ -21,7 +21,6 @@ const jestConfig = createJestConfig({
   collectCoverageFrom: [
     "infra/**/*.{js,ts}",
     "models/**/*.{js,ts}",
-    "pages/api/**/*.{js,ts}",
     "!**/*.test.{js,ts}",
     "!infra/migrations/**",
     "!infra/scripts/**",
