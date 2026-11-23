@@ -1,4 +1,6 @@
-import { sql } from "drizzle-orm";
+import { randomBytes } from "node:crypto";
+import argon2 from "argon2";
+import { eq, sql } from "drizzle-orm";
 import { db } from "infra/drizzle.ts";
 import { users } from "models/schema.ts";
 import { ValidationError, NotFoundError } from "infra/errors.js";
@@ -24,12 +26,17 @@ async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
 
+  const passwordHash = await argon2.hash(userInputValues.password);
+  const activationToken = randomBytes(32).toString("hex");
+
   const [newUser] = await db
     .insert(users)
     .values({
       username: userInputValues.username,
       email: userInputValues.email,
-      password: userInputValues.password,
+      password: passwordHash,
+      active: false,
+      activation_token: activationToken,
     })
     .returning();
 
@@ -66,9 +73,45 @@ async function create(userInputValues) {
   }
 }
 
+async function activateByToken(token) {
+  if (!token) {
+    throw new ValidationError({
+      message: "O token de ativação é obrigatório.",
+      action: "Informe um token de ativação válido.",
+    });
+  }
+
+  const [userFound] = await db
+    .select()
+    .from(users)
+    .where(eq(users.activation_token, token))
+    .limit(1);
+
+  if (!userFound) {
+    throw new NotFoundError({
+      message:
+        "O token de ativação informado não foi encontrado ou é inválido.",
+      action: "Solicite um novo link de ativação de conta.",
+    });
+  }
+
+  const [activatedUser] = await db
+    .update(users)
+    .set({
+      active: true,
+      activation_token: null,
+      updated_at: new Date().toISOString(),
+    })
+    .where(eq(users.id, userFound.id))
+    .returning();
+
+  return activatedUser;
+}
+
 const user = {
   create,
   findOneByUsername,
+  activateByToken,
 };
 
 export default user;
