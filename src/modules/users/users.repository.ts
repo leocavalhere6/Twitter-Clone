@@ -1,8 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { DatabaseService } from "src/infra/database/database.service";
 import { users, User } from "models/schema";
-import { CreateUserDto } from "./dto/create-user.dto";
+
+export interface CreateUserPersistenceInput {
+  username: string;
+  email: string;
+  password: string;
+  active?: boolean;
+  activationToken?: string | null;
+}
 
 @Injectable()
 export class UsersRepository {
@@ -18,6 +25,16 @@ export class UsersRepository {
       .select()
       .from(users)
       .where(sql`LOWER(${users.username}) = LOWER(${username})`)
+      .limit(1);
+
+    return userFound;
+  }
+
+  async findByActivationToken(token: string): Promise<User | undefined> {
+    const [userFound] = await this.databaseService.db
+      .select()
+      .from(users)
+      .where(eq(users.activation_token, token))
       .limit(1);
 
     return userFound;
@@ -43,16 +60,32 @@ export class UsersRepository {
     return Boolean(existingUser);
   }
 
-  async create(input: CreateUserDto): Promise<User> {
+  async create(input: CreateUserPersistenceInput): Promise<User> {
     const [newUser] = await this.databaseService.db
       .insert(users)
       .values({
         username: input.username,
         email: input.email,
         password: input.password,
+        active: input.active ?? false,
+        activation_token: input.activationToken ?? null,
       })
       .returning();
 
     return newUser;
+  }
+
+  async activateUser(userId: string): Promise<User> {
+    const [activatedUser] = await this.databaseService.db
+      .update(users)
+      .set({
+        active: true,
+        activation_token: null,
+        updated_at: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return activatedUser;
   }
 }

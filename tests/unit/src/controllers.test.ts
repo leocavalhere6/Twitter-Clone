@@ -8,6 +8,7 @@ jest.mock("@nestjs/common", () => ({
   Param: () => () => {},
   Body: () => () => {},
   Inject: () => () => {},
+  Optional: () => () => {},
   HttpStatus: {
     CREATED: 201,
   },
@@ -67,6 +68,8 @@ describe("NestJS controllers delegation", () => {
       username: "leo_dev",
       email: "leo@example.com",
       password: "hashed-password",
+      active: false,
+      activation_token: "token-123",
       created_at: new Date(),
       updated_at: new Date(),
     };
