@@ -53,6 +53,59 @@ test.describe("Frontend Interface & Smoke Tests", () => {
   });
 });
 
+test.describe("Users & Activation API E2E Flow", () => {
+  test("should create inactive user with argon2id, activate account, and handle errors", async ({
+    request,
+  }) => {
+    const suffix = Date.now();
+    const username = `e2e_user_${suffix}`;
+    const email = `e2e_${suffix}@example.com`;
+
+    const createResponse = await request.post("/api/v1/users", {
+      data: {
+        username,
+        email,
+        password: "Password123!",
+      },
+    });
+
+    expect(createResponse.status()).toBe(201);
+    const created = await createResponse.json();
+    expect(created.username).toBe(username);
+    expect(created.email).toBe(email);
+    expect(created.active).toBe(false);
+    expect(created.password).toMatch(/^\$argon2id\$/);
+    expect(typeof created.activation_token).toBe("string");
+
+    const duplicateResponse = await request.post("/api/v1/users", {
+      data: {
+        username: `other_${suffix}`,
+        email,
+        password: "Password123!",
+      },
+    });
+    expect(duplicateResponse.status()).toBe(400);
+
+    const getResponse = await request.get(`/api/v1/users/${username}`);
+    expect(getResponse.status()).toBe(200);
+    const fetched = await getResponse.json();
+    expect(fetched.id).toBe(created.id);
+
+    const activateResponse = await request.post("/api/v1/users/activate", {
+      data: { token: created.activation_token },
+    });
+    expect(activateResponse.status()).toBe(200);
+    const activated = await activateResponse.json();
+    expect(activated.active).toBe(true);
+    expect(activated.activation_token).toBeNull();
+
+    const invalidTokenResponse = await request.post("/api/v1/users/activate", {
+      data: { token: "invalid-token-value" },
+    });
+    expect(invalidTokenResponse.status()).toBe(404);
+  });
+});
+
 test.describe("API Health & Infrastructure E2E Checks", () => {
   test("GET /api/v1/status should return 200 OK with database dependencies", async ({
     request,
