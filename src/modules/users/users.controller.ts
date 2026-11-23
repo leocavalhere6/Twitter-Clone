@@ -20,6 +20,12 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Post("activate")
+  @HttpCode(HttpStatus.OK)
+  async activate(@Body("token") token: string) {
+    return this.usersService.activateByToken(token);
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ZodValidationPipe(createUserSchema))
