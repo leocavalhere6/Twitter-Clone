@@ -58,14 +58,14 @@ _(Tudo construído na nova arquitetura limpa, evitando qualquer retrabalho)_
 - **PR #17: Camada de Consulta Flexível (GraphQL)**
   - **Escopo:** Exposição de endpoint `/graphql` paralelo ao REST com queries e mutations para buscar feed, perfil e dados aninhados de forma flexível.
 
-## Fase 5: Experiência Completa do Usuário (Front-end Definitivo)
-
-- **PR #18: Desenvolvimento Completo do Front-End (Next.js)**
-  - **Escopo:** Construção de todas as páginas da aplicação no Next.js (perfil, timeline em tempo real, interações, busca semântica/RAG e notificações) totalmente integradas aos serviços do NestJS.
-
-## Fase 6: Infraestrutura Local e IaC
+## Fase 5: Infraestrutura Local e IaC
 
 - **PR #19: Orquestração Local com Kubernetes (Kind / Minikube)**
   - **Escopo:** Criação de manifests básicos (`Deployment`, `Service`, etc.) e subida/teste dos serviços em cluster Kubernetes local com Kind ou Minikube.
 - **PR #20: Infraestrutura como Código (Terraform)**
   - **Escopo:** Provisionamento e gerenciamento declarativo de ambiente via Terraform (provider Docker local ou recursos simples na AWS Free Tier).
+
+## Fase 6: Experiência Completa do Usuário (Front-end Definitivo)
+
+- **PR #18: Desenvolvimento Completo do Front-End (Next.js)**
+  - **Escopo:** Construção de todas as páginas da aplicação no Next.js (perfil, timeline em tempo real, interações, busca semântica/RAG e notificações) totalmente integradas aos serviços do NestJS.
