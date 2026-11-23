@@ -10,17 +10,13 @@ const createJestConfig = nextJest({
   dir: ".",
 });
 
-const jestConfig = createJestConfig({
+const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>"],
   testTimeout: 60000,
   testPathIgnorePatterns: [
     "<rootDir>/node_modules/",
     "<rootDir>/.next/",
     "<rootDir>/tests/e2e/",
-  ],
-  transformIgnorePatterns: [
-    "/node_modules/(?!(@nestjs|rxjs)/)",
-    "^.+\\.module\\.(css|sass|scss)$",
   ],
   collectCoverageFrom: [
     "infra/**/*.{js,ts}",
@@ -34,6 +30,15 @@ const jestConfig = createJestConfig({
   ],
   coverageReporters: ["text", "lcov", "html"],
   coverageDirectory: "coverage",
-});
+};
 
-module.exports = jestConfig;
+module.exports = async () => {
+  const jestConfig = await createJestConfig(customJestConfig)();
+
+  jestConfig.transformIgnorePatterns = [
+    "/node_modules/(?!(@nestjs|rxjs)/)",
+    "^.+\\.module\\.(css|sass|scss)$",
+  ];
+
+  return jestConfig;
+};
