@@ -1,80 +1,59 @@
 # todo.md — Twitter Clone (Roadmap de Engenharia)
 
-## Ações Imediatas (Pré-Pivô / Estabilização)
+## Ações Imediatas (Pré-Pivô / Estabilização) — Concluído
 
-- **Fix #1: Estabilizar Teste de Integração (`status/get.test.js`)**
-  - **Escopo:** Corrigir a asserção não-determinística de `opened_connections` em `tests/integration/api/v1/status/get.test.js` para que o `npm test` volte a passar 100% (`exit code 0`).
-- **Fix #2: Refinar Cobertura de Testes & Escopo (`jest.config.js`)**
-  - **Escopo:** Cobrir os caminhos não testados em `models/migrator.js` e `infra/rate-limiter.ts` e revisar `collectCoverageFrom` no `jest.config.js` (excluindo handlers HTTP de `pages/api` que são testados via rede).
-- **Fix #3: Regra Arquitetural para o Pivô**
-  - **Escopo:** Não remendar nem migrar arquivos `.js` soltos na estrutura atual de `pages/api`; consolidar o TypeScript estrito e a separação de camadas diretamente durante o **PR #9 (Migração para o NestJS)**.
+- **Fix #1: Estabilizar Teste de Integração (`status/get.test.js`) (Concluído)**
+- **Fix #2: Refinar Cobertura de Testes & Escopo (`jest.config.js`) (Concluído)**
+- **Fix #3: Regra Arquitetural para o Pivô (Concluído)**
 
-## Fase 1: Fundação de Engenharia, Qualidade e Interface Inicial
+## Fase 1: Fundação de Engenharia, Qualidade e Interface Inicial — Concluído
 
 - **PR #1: Higiene do Repositório (.gitignore & Clean Build) (Concluído)**
-  - **Escopo:** Remoção de pastas compiladas e ajuste fino do `.gitignore`.
 - **PR #2: Tipagem Estática (TypeScript Setup) (Concluído)**
-  - **Escopo:** Configuração do `tsconfig.json` e migração gradual dos módulos de infra e models.
 - **PR #3: Validação Declarativa de Schemas (Zod) (Concluído)**
-  - **Escopo:** Validação estrita de payloads HTTP e variáveis de ambiente.
 - **PR #4: Observabilidade e Logs Estruturados (Pino) (Concluído)**
-  - **Escopo:** Substituição de `console.log` por logs em JSON integrados ao tratamento de erros.
 - **PR #5: Middleware de Rate Limiting (Concluído)**
-  - **Escopo:** Proteção de rotas sensíveis contra força bruta usando Redis.
 - **PR #6: Interface Mínima de Front-end (Concluído)**
-  - **Escopo:** Reescrever a tela inicial atual para entregar uma interface web limpa, responsiva e com identidade visual inspirada no Twitter (feed básico, layout de colunas, navegação lateral e formulário de postagem).
-  - **Impacto:** Estabelece uma base visual real e funcional logo no início para validações e testes de UI.
 - **PR #7: Testes End-to-End e de API (Playwright) (Concluído)**
-  - **Escopo:** Configuração do runner do Playwright e criação de smoke tests automatizados e testes de rotas HTTP.
 - **PR #8: Abstração de Banco de Dados (Drizzle ORM) (Concluído)**
-  - **Escopo:** Adição do Drizzle ORM mantendo a performance de SQL puro com type-safety e autocompletion.
 
-## Fase 2: O Pivo Arquitetural (Backend em NestJS)
+## Fase 2: O Pivô Arquitetural (Backend em NestJS) — Concluído
 
-- **PR #9: Migração para o NestJS (Fundação de Domínios)**
-  - **Escopo:** Estruturação da pasta `src/` em TypeScript estrito, configuração do `DatabaseService` global e migração dos módulos base (`Status`, `Migrations`, `Users`) para o padrão de Controllers, Services e Repositories do NestJS (sem remendar a estrutura legada de `pages/api`).
+- **PR #9: Migração para o NestJS (Fundação de Domínios) (Concluído)**
+  - **Escopo entregue:** Estruturação da pasta `src/` em TypeScript estrito, `DatabaseService`, `MailService`, filtros de exceção, pipes com Zod e módulos `Status`, `Migrations` e `Users` (`src/modules/`), mantendo coexistência com as rotas HTTP em `pages/api/v1/` e modelos compartilhados em `models/`.
 
-## Fase 3: Identidade, Segurança e Comunicação (Diretamente no NestJS)
+## Fase 3: Identidade, Segurança e Comunicação — Concluído
 
-_(Tudo construído na nova arquitetura limpa, evitando qualquer retrabalho)_
+- **PR #10: Serviço de E-mails Transacionais (Concluído)**
+  - **Escopo entregue:** Mailpit no Docker, templates de e-mail (`activation` e `welcome`) e `MailService` testado.
+- **PR #11: Perfil de Usuário & Engenharia de Senhas (Concluído)**
+  - **Escopo entregue:** Geração automática de `.env.development` (`ensure-env-dev.js`), hash de senhas com `argon2id`, campos `active` e `activation_token` no schema/migration, e fluxo de ativação de conta.
+- **PR #12 & PR #13 (Consolidados): Autenticação & Autorização (RBAC) (Concluído)**
+  - **Escopo entregue:**
+    - Tabela `sessions` e colunas `role` (`default: 'user'`) e `features` (`default: ['create:session', 'read:session']`) em `users`.
+    - `models/session.js` com `argon2.verify`, bloqueio de conta inativa (`active: false`), criação/expiração de sessão e cookies `session_id` (`HttpOnly`, `SameSite=Lax`, `Path=/`, e `Secure` em produção).
+    - Endpoints `POST` e `DELETE /api/v1/sessions` (login e logout).
+    - Decorator `@RequireFeatures(...)`, `SessionAuthGuard` e `FeaturesGuard` no NestJS para autenticação por cookie e validação de escopos/papel (`401`/`403`).
 
-- **PR #10: Serviço de E-mails Transacionais**
-  - **Escopo:** Configuração do Mailpit no Docker e abstração de envio de templates HTML via serviços do NestJS.
-- **PR #11: Perfil de Usuário & Engenharia de Senhas**
-  - **Escopo:** Hash seguro de senhas com Argon2 e fluxo de tokens de ativação de conta por e-mail.
-- **PR #12: Sistema de Autenticação**
-  - **Escopo:** Endpoints de login e logout (`POST/DELETE /api/v1/sessions`) gerenciando sessões via cookies `HttpOnly`, `Secure` e `SameSite=Lax`.
-- **PR #13: Sistema de Autorização (RBAC)**
-  - **Escopo:** Guards e Middlewares do NestJS para proteção de rotas privadas e validação de permissões por escopo.
+## Fase 4: Escalabilidade, Dados, IA e Arquitetura Avançada (Monolito Modular)
 
-Coexistência Next.js (pages/api/v1/...) + NestJS (src/modules/...):
-Hoje POST /api/v1/users, GET /api/v1/users/[username] e POST /api/v1/users/activate rodam via pages/api/v1/... usando models/user.js, enquanto o NestJS sobe em paralelo em src/modules/.... Para o PR #12 + #13, o ideal é que a lógica central de sessions e validação de sessão/escopos seja reutilizável tanto no módulo NestJS (src/modules/sessions/ + src/common/guards/) quanto nas rotas pages/api/v1/sessions/index.js — assim você não duplica regra de expiração ou cookie.
-
-Cookie Secure em desenvolvimento local:
-Se você setar Secure incondicionalmente em http://localhost:3000, alguns browsers/clientes podem ignorar o cookie fora de HTTPS. O padrão seguro é: Secure ativado em produção (process.env.NODE_ENV === "production"), HttpOnly e SameSite=Lax sempre.
-
-RBAC simples e explícito:
-Adicionar role (varchar, default 'user') e features (text[] ou jsonb, default ['create:session', 'read:session']) em users já resolve tanto verificação por papel quanto por escopo granular (create:session, read:session, etc.) sem precisar mexer no banco de novo.
-
-## Fase 4: Escalabilidade, Dados, IA e Arquitetura Avançada
-
-- **PR #14: Desacoplamento em Microsserviços & Mensageria (RabbitMQ)**
-  - **Escopo:** Quebra dos domínios do NestJS em serviços independentes (ex.: Serviço de Usuários e Serviço de Posts) comunicando-se de forma assíncrona via RabbitMQ (disparo de eventos na criação de posts para processamento em background, embeddings e notificações).
+- **PR #14: Módulo de Posts & Mensageria Assíncrona (RabbitMQ)**
+  - **Escopo:** Manter o monolito modular em NestJS (evitando o overhead operacional de múltiplos microsserviços separados), adicionando o módulo `Posts` (`src/modules/posts/`) e infraestrutura RabbitMQ (`src/infra/messaging/`) para publicar eventos como `post.created` e consumir tarefas em background de forma assíncrona (geração de embeddings, auditoria/logs e notificações).
 - **PR #15: Camada de Dados Não Relacionais (MongoDB)**
-  - **Escopo:** Integração do MongoDB para persistência de dados com estrutura variável ou alta taxa de escrita (ex.: logs de eventos, histórico de ações ou notificações).
-- **PR #16: Busca Vetorial e RAG Simples (`pgvector`)**
-  - **Escopo:** Habilitação da extensão `pgvector` no PostgreSQL, geração de embeddings de posts/conteúdos via API gratuita de LLM, armazenamento vetorial e consulta por similaridade/RAG.
+  - **Escopo:** Manter o PostgreSQL + Drizzle ORM como banco principal transacional e integrar MongoDB (`src/infra/mongodb/`) de forma complementar e não bloqueante para dados de alta escrita ou schema flexível (ex.: `activity_logs` de eventos/auditoria e `notifications`).
+- **PR #16: Busca Vetorial e RAG Simples (`pgvector` + IA Gratuita)**
+  - **Escopo:** Habilitar `pgvector` no PostgreSQL existente via migration, armazenar embeddings dos posts (gerados no fluxo assíncrono do PR #14 usando camada de serviço desacoplada sobre API gratuita de LLM, como Gemini free tier e expor busca por similaridade vetorial (`<=>`) / RAG simples em cima dos conteúdos.
 - **PR #17: Camada de Consulta Flexível (GraphQL)**
-  - **Escopo:** Exposição de endpoint `/graphql` paralelo ao REST com queries e mutations para buscar feed, perfil e dados aninhados de forma flexível.
+  - **Escopo:** Expor endpoint `/graphql` no NestJS paralelo ao REST, com queries e mutations reutilizando os mesmos services dos módulos (feed, perfil, posts, busca semântica e dados aninhados) sem duplicar regras de negócio.
 
 ## Fase 5: Infraestrutura Local e IaC
 
 - **PR #19: Orquestração Local com Kubernetes (Kind / Minikube)**
-  - **Escopo:** Criação de manifests básicos (`Deployment`, `Service`, etc.) e subida/teste dos serviços em cluster Kubernetes local com Kind ou Minikube.
+  - **Escopo:** Criar manifests básicos (`Deployment`, `Service`, etc.) e subir/testar a stack em cluster Kubernetes local com Kind ou Minikube.
 - **PR #20: Infraestrutura como Código (Terraform)**
-  - **Escopo:** Provisionamento e gerenciamento declarativo de ambiente via Terraform (provider Docker local ou recursos simples na AWS Free Tier).
+  - **Escopo:** Provisionar e gerenciar ambiente de forma declarativa via Terraform (provider Docker local).
 
 ## Fase 6: Experiência Completa do Usuário (Front-end Definitivo)
 
 - **PR #18: Desenvolvimento Completo do Front-End (Next.js)**
-  - **Escopo:** Construção de todas as páginas da aplicação no Next.js (perfil, timeline em tempo real, interações, busca semântica/RAG e notificações) totalmente integradas aos serviços do NestJS.
+  - **Escopo:** Construir as páginas completas da aplicação no Next.js (perfil, timeline em tempo real, interações, busca semântica/RAG e notificações) integradas aos serviços do NestJS.
