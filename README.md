@@ -1,183 +1,163 @@
 # Twitter Clone
 
-A full-stack social platform inspired by Twitter/X, built with **TypeScript, Next.js, PostgreSQL, Redis, and Docker**.
+A modular full-stack social platform built with **TypeScript**, **NestJS**, **Next.js (Pages Router)**, **PostgreSQL** (Drizzle ORM + pgvector), **Redis**, **RabbitMQ**, **MongoDB**, and **GraphQL**. Local infrastructure is orchestrated with Docker Compose, Terraform, and Kubernetes (Kind).
 
-The application includes authentication, user management, posts, social interactions, API validation, automated testing, structured logging, and CI/CD.
+## Architecture Overview
 
-🔗 **Live Demo:** https://tabnews-weld-ten.vercel.app
+The repository combines a modular NestJS backend (`src/`) with Next.js pages and API routes (`pages/`), shared domain models and schemas (`models/`), and infrastructure and migration tooling (`infra/`).
 
-📦 **Repository:** https://github.com/leocavalhere6/tabnews
+### NestJS Modular Monolith (`src/`)
 
----
+- **Modules (`src/modules/`):** `users`, `posts`, `migrations`, `status`, and `graphql`.
+- **Common Layer (`src/common/`):** `@RequireFeatures` decorator, `SessionAuthGuard`, `FeaturesGuard`, `DomainExceptionFilter`, and `ZodValidationPipe`.
+- **Infrastructure Services (`src/infra/`):**
+  - `DatabaseService` for database access.
+  - `MailService` with activation and welcome email templates.
+  - `RabbitMQService` for asynchronous background events, such as `post.created`.
+  - `MongoDBService` for flexible, high-write data such as activity logs.
+  - `AiService` for embeddings and Retrieval-Augmented Generation (RAG).
 
-## 🚀 Tech Stack
+### Next.js & Shared Models (`pages/`, `models/`, `infra/`)
 
-- **TypeScript**
-- **Next.js**
-- **React**
-- **PostgreSQL**
-- **Redis**
-- **Drizzle ORM**
-- **Zod**
-- **Pino**
-- **Jest**
-- **Playwright**
-- **Docker & Docker Compose**
-- **GitHub Actions**
+- Next.js Pages Router frontend (`pages/index.js`, `pages/status/index.js`) and REST API routes (`pages/api/v1/...`).
+- PostgreSQL migrations managed with `node-pg-migrate` (`infra/migrations/`), including `pgvector` support.
+- Drizzle ORM schema (`models/schema.ts`, `infra/drizzle.ts`).
+- Session management (`models/session.js`) using `argon2` password verification and `HttpOnly` session cookies.
+- Structured logging with Pino (`infra/logger.ts`) and rate limiting (`infra/rate-limiter.ts`).
 
----
+### Local Infrastructure & Infrastructure as Code (`infra/`)
 
-## ✨ Features
+- **Docker Compose (`infra/compose.yaml`):** PostgreSQL (`pgvector/pgvector:pg16`), Redis (`redis:7-alpine`), Mailpit (`axllent/mailpit:v1.21`), RabbitMQ (`rabbitmq:3.13-management-alpine`), and MongoDB (`mongo:7`).
+- **Terraform (`infra/terraform/`):** Declarative Docker provider configuration (`main.tf`, `variables.tf`) for local containers and networking.
+- **Kubernetes (`infra/k8s/`):** Manifests for local clusters such as Kind, including `namespace.yaml`, `config-secret.yaml`, `postgres.yaml`, `redis.yaml`, `mongodb.yaml`, `rabbitmq.yaml`, and `mailpit.yaml`.
 
-- User registration and authentication
-- Secure password hashing with Argon2id
-- Session management with HttpOnly and Secure cookies
-- User profiles
-- Posts and social interactions
-- REST API
-- Request validation with Zod
-- IP-based rate limiting with Redis
-- PostgreSQL database with migrations
-- Structured logging with Pino
-- Background processing
-- Integration tests
-- End-to-end tests with Playwright
-- CI/CD with GitHub Actions
-- Dockerized development environment
+## Tech Stack
 
----
+| Category                     | Technologies                                                                                                            |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Runtime & Language**       | Node.js, TypeScript, JavaScript                                                                                         |
+| **Backend & Web**            | NestJS, Next.js (Pages Router), React, SWR, GraphQL, Zod                                                                |
+| **Databases & Messaging**    | PostgreSQL, `pg`, `node-pg-migrate`, Drizzle ORM, `pgvector`, Redis, `ioredis`, MongoDB, `mongodb`, RabbitMQ, `amqplib` |
+| **Security & Observability** | `argon2`, Pino, rate limiting                                                                                           |
+| **Testing & Tooling**        | Jest, Supertest, integration test helpers, Playwright, ESLint, Prettier, Husky, Commitlint, Commitizen                  |
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```text
-.
-├── .github/        # CI/CD workflows
-├── .husky/         # Git hooks
-├── infra/          # Database and infrastructure
-├── models/         # Data models
-├── pages/          # Application and API routes
-├── styles/         # Global styles
-├── tests/          # Integration and E2E tests
-├── package.json
-└── README.md
+├── .github/workflows/    # CI workflows for linting, unit/integration tests, and E2E tests
+├── .husky/               # Git hooks (e.g., commitlint on commit-msg)
+├── infra/
+│   ├── k8s/              # Kubernetes manifests (Namespace, ConfigMap/Secret, Deployments, Services)
+│   ├── migrations/       # Database migrations (users, activation, sessions/RBAC, posts, pgvector)
+│   ├── scripts/          # Development environment and database readiness helpers
+│   └── terraform/        # Terraform configuration using the Docker provider
+├── models/               # Shared models, schemas, migrator, session, and user logic
+├── pages/                # Next.js pages and /api/v1 REST endpoints
+├── src/
+│   ├── common/           # Guards, decorators, exception filters, and Zod validation pipes
+│   ├── infra/            # NestJS infrastructure modules (AI, database, mail, messaging, MongoDB)
+│   └── modules/          # Feature modules (graphql, migrations, posts, status, users)
+├── styles/               # Global styles
+└── tests/
+    ├── e2e/              # Playwright end-to-end tests
+    ├── integration/      # Jest integration tests (API routes and models)
+    └── unit/             # Jest unit tests (infra, models, and NestJS src)
 ```
 
----
+## Getting Started
 
-## 🧪 Testing
-
-The project includes automated tests covering the main application flows.
-
-## 🧪 Test Coverage
-
-The project includes automated unit and integration test suites built with **Jest**, focusing on isolating the infrastructure layer and core business logic.
-
-- **Infrastructure (`infra/`):** >95% coverage
-- **Data Models (`models/`):** >82% coverage
-- **Branch Logic (Branches):** 80.48% coverage
-- **Functions:** 78.12% coverage
-
-### Integration Tests
-
-- Authentication
-- Users
-- Sessions
-- API validation
-- Database interactions
-- Rate limiting
-
-### End-to-End Tests
-
-Playwright is used to test complete user flows through the application.
-
-Run the test suite with:
-
-```bash
-npm test
-```
-
-Run E2E tests with:
-
-```bash
-npm run test:e2e
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js
-- npm
-- Docker
-- Docker Compose
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/leocavalhere6/tabnews.git
-
-cd tabnews
-```
-
-### 2. Install dependencies
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Start the infrastructure
+### 2. Start Services & Run Migrations
 
-```bash
-docker compose up -d
-```
+The `npm run dev` command automatically:
 
-### 4. Run database migrations
-
-```bash
-npm run db:migrate
-```
-
-### 5. Start the development server
+1. Generates `.env.development` if it does not exist, using `ensure-env-dev.js`.
+2. Starts Docker containers through `infra/compose.yaml`.
+3. Waits for PostgreSQL to become available.
+4. Runs pending database migrations.
+5. Starts the NestJS and Next.js development servers concurrently.
 
 ```bash
 npm run dev
 ```
 
----
+You can also manage services and migrations individually:
 
-## ⚙️ CI/CD
+```bash
+npm run services:up
+npm run services:wait:database
+npm run migrations:up
+npm run services:stop
+npm run services:down
+```
 
-GitHub Actions is used for automated:
+## Testing, Type-Checking & Linting
 
-- Linting
-- Type checking
-- Testing
-- Deployment
+**Unit and integration tests, including TypeScript type-checking:**
 
----
+```bash
+npm test
+```
 
-## 🧹 Code Quality
+**Playwright end-to-end tests:**
 
-The project uses:
+```bash
+npm run e2e
+```
 
-- ESLint
-- Husky
-- Commitlint
-- Conventional Commits
-- Semantic Versioning
+Interactive mode:
 
----
+```bash
+npm run e2e:ui
+```
 
-## 👨‍💻 Author
+**Full test suite (Jest, type-checking, and Playwright):**
 
-**Leonardo Henrique de Oliveira Cavalhere**
+```bash
+npm run test:all
+```
 
-Full Stack Software Engineer
+**Watch mode and type-checking:**
 
-📧 [leocavalhere6@gmail.com](mailto:leocavalhere6@gmail.com)
+```bash
+npm run test:watch
+npm run type-check
+```
 
-💼 https://linkedin.com/in/leonardo-cavalhere
+**Linting and formatting:**
 
-🐙 https://github.com/leocavalhere6
+```bash
+npm run lint:all
+npm run lint:eslint:check
+npm run lint:prettier:check
+npm run lint:prettier:fix
+```
+
+## Local Infrastructure (Terraform & Kubernetes)
+
+### Terraform (Docker Provider)
+
+```bash
+cd infra/terraform
+terraform init
+terraform validate
+terraform plan
+```
+
+### Kubernetes (Kind)
+
+```bash
+kind create cluster --name twitter-clone
+kubectl apply -f infra/k8s/namespace.yaml
+kubectl apply -f infra/k8s/
+kubectl get all -n twitter-clone
+```
+
+## License
+
+MIT

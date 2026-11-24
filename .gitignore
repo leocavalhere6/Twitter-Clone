@@ -10,6 +10,8 @@
 /.next/
 /out/
 /.swc/
+/dist/
+tsconfig.tsbuildinfo
 
 # Production & Local Builds
 /build
@@ -37,12 +39,13 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?tsconfig.tsbuildinfo
-tsconfig.tsbuildinfo
-
-
-TODO.md
+*.sw?
 
 # Playwright
 /playwright-report/
 /test-results/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*

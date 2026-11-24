@@ -27,14 +27,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leocavalhere6/tabnews.git"
+    "url": "git+https://github.com/leocavalhere6/Twitter-Clone.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leocavalhere6/tabnews/issues"
+    "url": "https://github.com/leocavalhere6/Twitter-Clone/issues"
   },
-  "homepage": "https://github.com/leocavalhere6/tabnews#readme",
+  "homepage": "https://github.com/leocavalhere6/Twitter-Clone#readme",
   "dependencies": {
     "@nestjs/common": "^12.6.0",
     "@nestjs/core": "^12.6.0",
@@ -75,8 +75,8 @@
     "@types/node": "^26.4.1",
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.1",
     "commitizen": "4.3.0",
     "concurrently": "8.2.2",
     "cz-conventional-changelog": "3.3.0",
