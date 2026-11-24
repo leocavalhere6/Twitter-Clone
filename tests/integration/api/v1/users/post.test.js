@@ -37,6 +37,8 @@ describe("POST /api/v1/users", () => {
         password: responseBody.password,
         active: false,
         activation_token: responseBody.activation_token,
+        role: "user",
+        features: ["create:session", "read:session"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
