@@ -1,7 +1,7 @@
 services:
   database:
     container_name: "postgres-dev"
-    image: "postgres:16.10-alpine3.22"
+    image: "pgvector/pgvector:pg16"
     env_file: ../.env.development
     ports:
       - "5432:5432"

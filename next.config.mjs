@@ -7,6 +7,10 @@ const nextConfig = {
         source: "/api/v1/:path*",
         destination: `http://127.0.0.1:${nestPort}/api/v1/:path*`,
       },
+      {
+        source: "/graphql",
+        destination: `http://127.0.0.1:${nestPort}/api/v1/graphql`,
+      },
     ];
   },
 };
