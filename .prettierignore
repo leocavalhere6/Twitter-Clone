@@ -1,1 +1,7 @@
 .next
+**/.terraform/**
+test-results/
+coverage/
+.next/
+.swc/
+infra/terraform/.terraform/

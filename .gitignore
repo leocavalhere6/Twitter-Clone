@@ -45,4 +45,6 @@ TODO.md
 
 # Playwright
 /playwright-report/
-/test-results/
+/test-results/.terraform/
+infra/terraform/.terraform/
+*.tfstate*
