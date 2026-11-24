@@ -41,11 +41,20 @@ _(Tudo construído na nova arquitetura limpa, evitando qualquer retrabalho)_
 - **PR #10: Serviço de E-mails Transacionais**
   - **Escopo:** Configuração do Mailpit no Docker e abstração de envio de templates HTML via serviços do NestJS.
 - **PR #11: Perfil de Usuário & Engenharia de Senhas**
-  - **Escopo:** Hash seguro de senhas com Argon2/Bcrypt e fluxo de tokens de ativação de conta por e-mail.
+  - **Escopo:** Hash seguro de senhas com Argon2 e fluxo de tokens de ativação de conta por e-mail.
 - **PR #12: Sistema de Autenticação**
   - **Escopo:** Endpoints de login e logout (`POST/DELETE /api/v1/sessions`) gerenciando sessões via cookies `HttpOnly`, `Secure` e `SameSite=Lax`.
 - **PR #13: Sistema de Autorização (RBAC)**
   - **Escopo:** Guards e Middlewares do NestJS para proteção de rotas privadas e validação de permissões por escopo.
+
+Coexistência Next.js (pages/api/v1/...) + NestJS (src/modules/...):
+Hoje POST /api/v1/users, GET /api/v1/users/[username] e POST /api/v1/users/activate rodam via pages/api/v1/... usando models/user.js, enquanto o NestJS sobe em paralelo em src/modules/.... Para o PR #12 + #13, o ideal é que a lógica central de sessions e validação de sessão/escopos seja reutilizável tanto no módulo NestJS (src/modules/sessions/ + src/common/guards/) quanto nas rotas pages/api/v1/sessions/index.js — assim você não duplica regra de expiração ou cookie.
+
+Cookie Secure em desenvolvimento local:
+Se você setar Secure incondicionalmente em http://localhost:3000, alguns browsers/clientes podem ignorar o cookie fora de HTTPS. O padrão seguro é: Secure ativado em produção (process.env.NODE_ENV === "production"), HttpOnly e SameSite=Lax sempre.
+
+RBAC simples e explícito:
+Adicionar role (varchar, default 'user') e features (text[] ou jsonb, default ['create:session', 'read:session']) em users já resolve tanto verificação por papel quanto por escopo granular (create:session, read:session, etc.) sem precisar mexer no banco de novo.
 
 ## Fase 4: Escalabilidade, Dados, IA e Arquitetura Avançada
 

@@ -39,6 +39,8 @@ describe("GET /api/v1/users/[username]", () => {
         password: response2Body.password,
         active: false,
         activation_token: response2Body.activation_token,
+        role: "user",
+        features: ["create:session", "read:session"],
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
@@ -82,6 +84,8 @@ describe("GET /api/v1/users/[username]", () => {
         password: response2Body.password,
         active: false,
         activation_token: response2Body.activation_token,
+        role: "user",
+        features: ["create:session", "read:session"],
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });
