@@ -18,3 +18,21 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+
+  messaging:
+    container_name: "rabbitmq-dev"
+    image: "rabbitmq:3.13-management-alpine"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  documentdb:
+    container_name: "mongodb-dev"
+    image: "mongo:7"
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: twitter_clone
