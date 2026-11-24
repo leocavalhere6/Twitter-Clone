@@ -76,27 +76,24 @@
 
 - **PR #21: Cobertura de Testes nos Módulos NestJS (`Posts` e `GraphQL`)**
 
-- **Escopo:** Cobrir `src/modules/posts/` (`posts.controller.ts`, `posts.service.ts`, `posts.repository.ts`, `create-post.dto.ts`) e `src/modules/graphql/` (`graphql.controller.ts`, `graphql.service.ts`) com testes unitários e de integração direcionados às implementações da camada `src/`.
+  - **Escopo:** Cobrir `src/modules/posts/` (`posts.controller.ts`, `posts.service.ts`, `posts.repository.ts`, `create-post.dto.ts`) e `src/modules/graphql/` (`graphql.controller.ts`, `graphql.service.ts`) com testes unitários e de integração direcionados às implementações da camada `src/`.
 
 - **PR #22: Cobertura de Testes em Sessão e Infraestrutura (`Session`, `RabbitMQ`, `MongoDB`)**
 
-- **Escopo:** Elevar a cobertura de `models/session.js`, `src/infra/messaging/rabbitmq.service.ts`, `src/infra/mongodb/mongodb.service.ts` e `src/infra/database/database.service.ts` (incluindo cenários de erro, reconexão/falha e fluxos de sessão).
+  - **Escopo:** Elevar a cobertura de `models/session.js`, `src/infra/messaging/rabbitmq.service.ts`, `src/infra/mongodb/mongodb.service.ts` e `src/infra/database/database.service.ts` (incluindo cenários de erro, reconexão/falha e fluxos de sessão).
 
 - **PR #23: Definição da Fonte de Verdade Arquitetural (`pages/api/` + `models/` vs. `src/` NestJS)**
 
-- **Escopo:** Padronizar e documentar qual camada é a fonte de verdade para cada domínio (ex.: auth/sessão, usuários, posts, status e migrations), eliminando duplicações de regra de negócio entre rotas Next.js (`pages/api/v1/`), `models/` e módulos NestJS (`src/modules/`).
+  - **Escopo:** Padronizar e documentar qual camada é a fonte de verdade para cada domínio (ex.: auth/sessão, usuários, posts, status e migrations), eliminando duplicações de regra de negócio entre rotas Next.js (`pages/api/v1/`), `models/` e módulos NestJS (`src/modules/`).
 
 - **PR #24: Higiene de Artefatos, Metadados do Repositório e Scripts de Teste**
 
-- **Escopo:**
-
-  - Garantir que diretórios gerados (`.next/`, `coverage/`, `test-results/`) estejam devidamente ignorados no `.gitignore` e não sujem o histórico/tree do projeto.
-  - Atualizar `repository`, `bugs` e `homepage` no `package.json` para o repositório `Twitter-Clone`.
-  - Revisar o `npm test` (`concurrently` com `nest:dev` + `next dev`) para evitar servidores subindo sem necessidade durante o Jest e investigar o encerramento de _open handles_ sem depender de `--forceExit`.
+  - **Escopo:**
+    - Garantir que diretórios gerados (`.next/`, `coverage/`, `test-results/`) estejam devidamente ignorados no `.gitignore` e não sujem o histórico/tree do projeto.
+    - Atualizar `repository`, `bugs` e `homepage` no `package.json` para o repositório `Twitter-Clone`.
+    - Revisar o `npm test` (`concurrently` com `nest:dev` + `next dev`) para evitar servidores subindo sem necessidade durante o Jest e investigar o encerramento de _open handles_ sem depender de `--forceExit`.
 
 - **PR #25: Alinhamento de Versões de Dependências e Tipagem (`React`, `TypeScript` e `ESLint`)**
-
   - **Escopo:** Alinhar `@types/react` e `@types/react-dom` à versão real do React (`18.3.1`) para evitar conflitos de tipos e validar a compatibilidade entre `typescript` (`^6.0.3`), `eslint` (`8.57.0`) e plugins do projeto.
-
 - **PR #26: Documentação da API com Swagger / OpenAPI**
-  - **Escopo:** Configurar `@nestjs/swagger` e `SwaggerModule` no bootstrap do NestJS (`src/main.ts`) para expor a especificação OpenAPI e o Swagger UI, documentando os módulos, endpoints e DTOs da API.
+- **Escopo:** Configurar `@nestjs/swagger` e `SwaggerModule` no bootstrap do NestJS (`src/main.ts`) para expor a especificação OpenAPI e o Swagger UI, documentando os módulos, endpoints e DTOs da API.
