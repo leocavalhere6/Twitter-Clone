@@ -1,9 +1,10 @@
 import { Module } from "@nestjs/common";
-import { DatabaseModule } from "src/infra/database/database.module";
-import { MailModule } from "src/infra/mail/mail.module";
-import { StatusModule } from "src/modules/status/status.module";
-import { MigrationsModule } from "src/modules/migrations/migrations.module";
-import { UsersModule } from "src/modules/users/users.module";
+import { Reflector } from "@nestjs/core";
+import { DatabaseModule } from "./infra/database/database.module";
+import { MailModule } from "./infra/mail/mail.module";
+import { MigrationsModule } from "./modules/migrations/migrations.module";
+import { StatusModule } from "./modules/status/status.module";
+import { UsersModule } from "./modules/users/users.module";
 
 @Module({
   imports: [
@@ -13,5 +14,6 @@ import { UsersModule } from "src/modules/users/users.module";
     MigrationsModule,
     UsersModule,
   ],
+  providers: [Reflector],
 })
 export class AppModule {}
