@@ -39,7 +39,7 @@ The repository combines a modular NestJS backend (`src/`) with Next.js pages and
 | **Backend & Web**            | NestJS, Next.js (Pages Router), React, SWR, GraphQL, Zod                                                                |
 | **Databases & Messaging**    | PostgreSQL, `pg`, `node-pg-migrate`, Drizzle ORM, `pgvector`, Redis, `ioredis`, MongoDB, `mongodb`, RabbitMQ, `amqplib` |
 | **Security & Observability** | `argon2`, Pino, rate limiting                                                                                           |
-| **Testing & Tooling**        | Jest, Supertest, integration test helpers, Playwright, ESLint, Prettier, Husky, Commitlint, Commitizen                  |
+| **Testing & Tooling**        | Jest, Playwright, ESLint, Prettier, Husky, Commitlint, Commitizen                                                       |
 
 ## Project Structure
 
@@ -55,9 +55,9 @@ The repository combines a modular NestJS backend (`src/`) with Next.js pages and
 ├── pages/                # Next.js pages and /api/v1 REST endpoints
 ├── src/
 │   ├── common/           # Guards, decorators, exception filters, and Zod validation pipes
-│   ├── infra/            # NestJS infrastructure modules (AI, database, mail, messaging, MongoDB)
-│   └── modules/          # Feature modules (graphql, migrations, posts, status, users)
-├── styles/               # Global styles
+│   ├── infra/             # NestJS infrastructure modules (AI, database, mail, messaging, MongoDB)
+│   └── modules/           # Feature modules (graphql, migrations, posts, status, users)
+├── styles/                # Global styles
 └── tests/
     ├── e2e/              # Playwright end-to-end tests
     ├── integration/      # Jest integration tests (API routes and models)
@@ -98,13 +98,13 @@ npm run services:down
 
 ## Testing, Type-Checking & Linting
 
-**Unit and integration tests, including TypeScript type-checking:**
+Start services, run Jest unit/integration tests with coverage, and run TypeScript type-checking:
 
 ```bash
 npm test
 ```
 
-**Playwright end-to-end tests:**
+Playwright end-to-end tests:
 
 ```bash
 npm run e2e
@@ -116,20 +116,20 @@ Interactive mode:
 npm run e2e:ui
 ```
 
-**Full test suite (Jest, type-checking, and Playwright):**
+Full test suite (Jest, type-checking, and Playwright):
 
 ```bash
 npm run test:all
 ```
 
-**Watch mode and type-checking:**
+Watch mode and type-checking:
 
 ```bash
 npm run test:watch
 npm run type-check
 ```
 
-**Linting and formatting:**
+Linting and formatting:
 
 ```bash
 npm run lint:all
@@ -147,6 +147,7 @@ cd infra/terraform
 terraform init
 terraform validate
 terraform plan
+terraform apply
 ```
 
 ### Kubernetes (Kind)
