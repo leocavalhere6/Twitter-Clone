@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -32,6 +33,28 @@ export class PostsController {
   async listFeed() {
     const items = await this.postsService.listFeed();
     return { items };
+  }
+
+  @Get("search")
+  async search(@Query("q") query = "", @Query("limit") limitRaw?: string) {
+    const parsedLimit = Number(limitRaw);
+    const limit =
+      Number.isFinite(parsedLimit) && parsedLimit > 0
+        ? Math.min(parsedLimit, 20)
+        : 5;
+    const items = await this.postsService.searchSimilar(query, limit);
+    return { items };
+  }
+
+  @Post("ask")
+  @HttpCode(HttpStatus.OK)
+  async ask(@Body() body: { question?: string; limit?: number }) {
+    const question = (body?.question ?? "").trim();
+    const limit =
+      typeof body?.limit === "number" && body.limit > 0
+        ? Math.min(body.limit, 20)
+        : 5;
+    return this.postsService.askQuestion(question, limit);
   }
 
   @Post()

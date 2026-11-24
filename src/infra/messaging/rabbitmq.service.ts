@@ -18,6 +18,11 @@ export class RabbitMqService implements OnModuleDestroy {
   private connection: ChannelModel | null = null;
   private channel: Channel | null = null;
 
+  private resetState(): void {
+    this.channel = null;
+    this.connection = null;
+  }
+
   private async getChannel(): Promise<Channel | null> {
     if (this.channel) {
       return this.channel;
@@ -26,25 +31,43 @@ export class RabbitMqService implements OnModuleDestroy {
     const url = process.env.RABBITMQ_URL || "amqp://guest:guest@localhost:5672";
 
     try {
-      this.connection = await amqp.connect(url);
-      this.connection.on("error", (err) => {
+      const connection = await amqp.connect(url);
+      connection.on("error", (err) => {
         logger.warn({ err }, "RabbitMQ connection error.");
+        this.resetState();
       });
-      this.channel = await this.connection.createChannel();
-      this.channel.on("error", (err) => {
+      connection.on("close", () => {
+        this.resetState();
+      });
+
+      const channel = await connection.createChannel();
+      channel.on("error", (err) => {
         logger.warn({ err }, "RabbitMQ channel error.");
+        this.channel = null;
       });
-      await this.channel.assertExchange(DEFAULT_EXCHANGE, "topic", {
+      channel.on("close", () => {
+        this.channel = null;
+      });
+
+      await channel.assertExchange(DEFAULT_EXCHANGE, "topic", {
         durable: true,
       });
+      await channel.assertQueue(POST_CREATED_QUEUE, { durable: true });
+      await channel.bindQueue(
+        POST_CREATED_QUEUE,
+        DEFAULT_EXCHANGE,
+        POST_CREATED_ROUTING_KEY,
+      );
+
+      this.connection = connection;
+      this.channel = channel;
       return this.channel;
     } catch (error) {
       logger.warn(
         { err: error, url },
         "RabbitMQ unavailable; skipping broker operation.",
       );
-      this.channel = null;
-      this.connection = null;
+      this.resetState();
       return null;
     }
   }
@@ -67,7 +90,7 @@ export class RabbitMqService implements OnModuleDestroy {
   ): Promise<void> {
     const channel = await this.getChannel();
     if (!channel) {
-      return;
+      throw new Error("RabbitMQ channel not ready yet.");
     }
 
     await channel.assertQueue(POST_CREATED_QUEUE, { durable: true });
@@ -98,5 +121,6 @@ export class RabbitMqService implements OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     await this.channel?.close().catch(() => undefined);
     await this.connection?.close().catch(() => undefined);
+    this.resetState();
   }
 }
