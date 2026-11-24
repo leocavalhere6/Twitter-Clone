@@ -1,3 +1,4 @@
+import { AiService } from "src/infra/ai/ai.service";
 import { RabbitMqService } from "src/infra/messaging/rabbitmq.service";
 import { MongoDbService } from "src/infra/mongodb/mongodb.service";
 import { PostsRepository } from "src/modules/posts/posts.repository";
@@ -7,6 +8,8 @@ describe("PostsService", () => {
   const mockRepository = {
     create: jest.fn(),
     findAllWithAuthor: jest.fn(),
+    updateEmbedding: jest.fn().mockResolvedValue(undefined),
+    findSimilarByEmbedding: jest.fn().mockResolvedValue([]),
   };
 
   const mockRabbitMq = {
@@ -19,6 +22,11 @@ describe("PostsService", () => {
     createNotification: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockAiService = {
+    generateEmbedding: jest.fn().mockResolvedValue(new Array(768).fill(0)),
+    generateRagAnswer: jest.fn().mockResolvedValue("Mocked RAG answer"),
+  };
+
   let service: PostsService;
 
   beforeEach(() => {
@@ -27,6 +35,7 @@ describe("PostsService", () => {
       mockRepository as unknown as PostsRepository,
       mockRabbitMq as unknown as RabbitMqService,
       mockMongoDb as unknown as MongoDbService,
+      mockAiService as unknown as AiService,
     );
   });
 
